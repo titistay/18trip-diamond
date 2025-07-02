@@ -81,11 +81,11 @@
       <label>目前鑽石數量</label>
       <input type="number" id="diamondsOwned" placeholder="例如：120">
 
-      <label>活動剩餘幾小時（自然回體用）</label>
-      <input type="number" id="hoursLeft" placeholder="例如：36">
+      <label>活動開始時間</label>
+      <input type="datetime-local" id="startDate">
 
-      <label>活動剩餘幾天（每日最多 10 體 1 鑽）</label>
-      <input type="number" id="daysLeft" placeholder="例如：5">
+      <label>活動結束時間</label>
+      <input type="datetime-local" id="endDate">
 
       <label>體力道具可補總體力數</label>
       <input type="number" id="staminaFromItems" placeholder="例如：30">
@@ -100,28 +100,47 @@
   </div>
 
   <script>
+    // 預設活動開始時間為今天
+    window.onload = function () {
+      const now = new Date();
+      const localISOTime = now.toISOString().slice(0, 16);
+      document.getElementById("startDate").value = localISOTime;
+    };
+
     function calculate() {
       let n = 1 + parseFloat(document.getElementById("bonus").value) / 100;
       let t = parseFloat(document.getElementById("targetScore").value);
       let s = parseFloat(document.getElementById("currentScore").value);
-      let m = parseInt(document.getElementById("hoursLeft").value);
-      let d = parseInt(document.getElementById("daysLeft").value);
       let k = parseInt(document.getElementById("diamondsOwned").value);
       let p = parseInt(document.getElementById("staminaFromItems").value);
+      let start = new Date(document.getElementById("startDate").value);
+      let end = new Date(document.getElementById("endDate").value);
+      let now = new Date();
 
-      if (isNaN(n) || isNaN(t) || isNaN(s) || isNaN(m) || isNaN(d) || isNaN(k) || isNaN(p)) {
+      if (isNaN(n) || isNaN(t) || isNaN(s) || isNaN(k) || isNaN(p) || isNaN(start) || isNaN(end)) {
         document.getElementById("result").innerHTML = "⚠️ 請完整填寫所有欄位！";
         return;
       }
 
+      if (now > end) {
+        document.getElementById("result").innerHTML = "⚠️ 活動已經結束了！請檢查結束時間";
+        return;
+      }
+
+      let diffMs = end - now;
+      let totalHours = Math.floor(diffMs / (1000 * 60 * 60));
+      let d = Math.floor(totalHours / 24); // 剩餘天數
+      let m = totalHours % 24;             // 剩餘小時數
+
       let x = Math.ceil((t - s) / (2890 * n));       // 所需體力
       let freeStamina = 2 * m + 10 * d + p;          // 免費取得體力
-      let y = Math.max(x - freeStamina, 0);          // 缺口體力
+      let y = Math.max(x - freeStamina, 0);          // 體力缺口
       let a = 2 * y + 10 * d;                        // 預估鑽石消耗
       let b = Math.max(a - k, 0);                    // 還需購買鑽石數
 
       document.getElementById("result").innerHTML =
-        ` 需要體力總共：<b>${x}</b><br>
+        ` 剩餘時間：<b>${d}</b> 天 <b>${m}</b> 小時<br>
+          需要體力總共：<b>${x}</b><br>
           體力缺口：<b>${y}</b><br>
           預估需花鑽石：<b>${a}</b><br>
           還需額外購買鑽石：<b>${b}</b>`;
