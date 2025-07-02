@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>積分鑽石計算器</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      margin: 40px auto;
+      max-width: 800px;
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-between;
+    }
+    .input-group, .output-group {
+      flex: 1 1 360px;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #4285f4;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3367d6;
+    }
+    #result {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    b {
+      color: #d9534f;
+    }
+  </style>
+</head>
+<body>
+  <h2>🎮 活動積分 / 鑽石花費計算器</h2>
+  <div class="container">
+    <div class="input-group">
+      <label>目前分數</label>
+      <input type="number" id="currentScore" placeholder="例如：45000">
+
+      <label>目標分數</label>
+      <input type="number" id="targetScore" placeholder="例如：200000">
+
+      <label>加成 % 數（例如輸入 20 表示 +20%）</label>
+      <input type="number" id="bonus" placeholder="例如：20">
+
+      <label>目前鑽石數量</label>
+      <input type="number" id="diamondsOwned" placeholder="例如：120">
+
+      <label>活動剩餘幾小時（自然回體用）</label>
+      <input type="number" id="hoursLeft" placeholder="例如：36">
+
+      <label>活動剩餘幾天（每日最多 10 體 1 鑽）</label>
+      <input type="number" id="daysLeft" placeholder="例如：5">
+
+      <label>體力道具可補總體力數</label>
+      <input type="number" id="staminaFromItems" placeholder="例如：30">
+
+      <button onclick="calculate()">開始計算</button>
+    </div>
+
+    <div class="output-group">
+      <h3>計算結果：</h3>
+      <div id="result">👉 請填寫左側欄位並按下按鈕。</div>
+    </div>
+  </div>
+
+  <script>
+    function calculate() {
+      let n = 1 + parseFloat(document.getElementById("bonus").value) / 100;
+      let t = parseFloat(document.getElementById("targetScore").value);
+      let s = parseFloat(document.getElementById("currentScore").value);
+      let m = parseInt(document.getElementById("hoursLeft").value);
+      let d = parseInt(document.getElementById("daysLeft").value);
+      let k = parseInt(document.getElementById("diamondsOwned").value);
+      let p = parseInt(document.getElementById("staminaFromItems").value);
+
+      if (isNaN(n) || isNaN(t) || isNaN(s) || isNaN(m) || isNaN(d) || isNaN(k) || isNaN(p)) {
+        document.getElementById("result").innerHTML = "⚠️ 請完整填寫所有欄位！";
+        return;
+      }
+
+      let x = Math.ceil((t - s) / (2890 * n));       // 所需體力
+      let freeStamina = 2 * m + 10 * d + p;          // 免費取得體力
+      let y = Math.max(x - freeStamina, 0);          // 缺口體力
+      let a = 2 * y + 10 * d;                        // 預估鑽石消耗
+      let b = Math.max(a - k, 0);                    // 還需購買鑽石數
+
+      document.getElementById("result").innerHTML =
+        ` 需要體力總共：<b>${x}</b><br>
+          體力缺口：<b>${y}</b><br>
+          預估需花鑽石：<b>${a}</b><br>
+          還需額外購買鑽石：<b>${b}</b>`;
+    }
+  </script>
+</body>
+</html>
