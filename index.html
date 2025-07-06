@@ -95,7 +95,7 @@
 
     <div class="output-group">
       <h3>計算結果：</h3>
-      <div id="result">👉 請填寫左側欄位並按下按鈕。</div>
+      <div id="result">👉 請填寫上方欄位並按下按鈕。</div>
     </div>
   </div>
 
@@ -115,22 +115,21 @@
       let p = parseInt(document.getElementById("staminaFromItems").value);
       let start = new Date(document.getElementById("startDate").value);
       let end = new Date(document.getElementById("endDate").value);
-      let now = new Date();
 
       if (isNaN(n) || isNaN(t) || isNaN(s) || isNaN(k) || isNaN(p) || isNaN(start) || isNaN(end)) {
         document.getElementById("result").innerHTML = "⚠️ 請完整填寫所有欄位！";
         return;
       }
 
-      if (now > end) {
-        document.getElementById("result").innerHTML = "⚠️ 活動已經結束了！請檢查結束時間";
+      if (start >= end) {
+        document.getElementById("result").innerHTML = "⚠️ 活動結束時間必須晚於開始時間！";
         return;
       }
 
-      let diffMs = end - now;
+      let diffMs = end - start;
       let totalHours = Math.floor(diffMs / (1000 * 60 * 60));
-      let d = Math.floor(totalHours / 24); // 剩餘天數
-      let m = totalHours % 24;             // 剩餘小時數
+      let d = Math.floor(totalHours / 24); // 活動總天數
+      let m = totalHours % 24;             // 多出來的時數
 
       let x = Math.ceil((t - s) / (2890 * n));       // 所需體力
       let freeStamina = 2 * m + 10 * d + p;          // 免費取得體力
@@ -139,7 +138,7 @@
       let b = Math.max(a - k, 0);                    // 還需購買鑽石數
 
       document.getElementById("result").innerHTML =
-        ` 剩餘時間：<b>${d}</b> 天 <b>${m}</b> 小時<br>
+        ` 活動期間：<b>${d}</b> 天 <b>${m}</b> 小時<br>
           需要體力總共：<b>${x}</b><br>
           體力缺口：<b>${y}</b><br>
           預估需花鑽石：<b>${a}</b><br>
